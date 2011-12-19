@@ -63,12 +63,26 @@
         StarFormatter : function(row, cell, value, columnDef, dataContext) {
             return (value) ? "<img src='../images/bullet_star.png' align='absmiddle'>" : "";
         },
+        
+        BaseCellEditor : function(args) {
+            this.loadValue = function(item) {
+                return args.grid.getFieldValue(item, args.column) || "";
+            };
 
+            this.applyValue = function(item,state) {
+                args.grid.setFieldValue(item, args.column, state);
+            };
+            
+            this.onLostFocus = function() {
+                args.commitChanges(true);
+            };
+		},
 
         TextCellEditor : function(args) {
             var $input;
             var defaultValue;
             var scope = this;
+            var base = new SlickEditor.BaseCellEditor(args);
 
             this.init = function() {
                 $input = $("<INPUT type=text class='editor-text' />")
@@ -77,6 +91,9 @@
                         if (e.keyCode === $.ui.keyCode.LEFT || e.keyCode === $.ui.keyCode.RIGHT) {
                             e.stopImmediatePropagation();
                         }
+                    })
+                    .focusout(function () {
+                        base.onLostFocus();
                     })
                     .focus()
                     .select();
@@ -99,18 +116,16 @@
             };
 
             this.loadValue = function(item) {
-                defaultValue = item[args.column.field] || "";
+                defaultValue = base.loadValue(item);
                 $input.val(defaultValue);
                 $input[0].defaultValue = defaultValue;
                 $input.select();
             };
+            
+            this.applyValue = base.applyValue;
 
             this.serializeValue = function() {
                 return $input.val();
-            };
-
-            this.applyValue = function(item,state) {
-                item[args.column.field] = state;
             };
 
             this.isValueChanged = function() {

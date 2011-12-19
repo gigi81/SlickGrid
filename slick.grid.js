@@ -1082,11 +1082,11 @@ if (typeof Slick === "undefined") {
         
         function setFieldValue(item, columnDef, newValue) {
             //check if value is a function
-            if(jQuery.isFunction(rowData[columnDef.field])) {
-                rowData[columnDef.field](newValue); //if so invoke it
+            if(jQuery.isFunction(item[columnDef.field])) {
+                item[columnDef.field](newValue); //if so invoke it
             }
             else {
-                rowData[columnDef.field] = newValue;
+                item[columnDef.field] = newValue;
             }
         }
 
@@ -1954,13 +1954,13 @@ if (typeof Slick === "undefined") {
                 handleActiveCellPositionChange();
         }
 
-        function commitEditAndSetFocus() {
+        function commitEditAndSetFocus(cancelMove) {
             // if the commit fails, it would do so due to a validation error
             // if so, do not steal the focus from the editor
             if (getEditorLock().commitCurrentEdit()) {
                   setFocus();
 
-                if (options.autoEdit) {
+                if (options.autoEdit && (cancelMove && !cancelMove)) {
                     navigateDown();
                 }
             }
