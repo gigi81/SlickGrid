@@ -1068,11 +1068,26 @@ if (typeof Slick === "undefined") {
             return column.editor || (options.editorFactory && options.editorFactory.getEditor(column));
         }
 
-        function getDataItemValueForColumn(item, columnDef) {
+        function getFieldValue(item, columnDef) {
             if (options.dataItemColumnValueExtractor) {
                 return options.dataItemColumnValueExtractor(item, columnDef);
             }
+            
+            //check if value is a function
+            if(jQuery.isFunction(item[columnDef.field]))
+                return item[columnDef.field](); //if so invoke it
+
             return item[columnDef.field];
+        }
+        
+        function setFieldValue(item, columnDef, newValue) {
+            //check if value is a function
+            if(jQuery.isFunction(rowData[columnDef.field])) {
+                rowData[columnDef.field](newValue); //if so invoke it
+            }
+            else {
+                rowData[columnDef.field] = newValue;
+            }
         }
 
         function appendRowHtml(stringArray, row) {
@@ -1111,7 +1126,7 @@ if (typeof Slick === "undefined") {
 
                 // if there is a corresponding row (if not, this is the Add New row or this data hasn't been loaded yet)
                 if (d) {
-                    stringArray.push(getFormatter(row, m)(row, i, getDataItemValueForColumn(d, m), m, d));
+                    stringArray.push(getFormatter(row, m)(row, i, getFieldValue(d, m), m, d));
                 }
 
                 stringArray.push("</div>");
@@ -1188,7 +1203,7 @@ if (typeof Slick === "undefined") {
                 currentEditor.loadValue(d);
             }
             else {
-                cellNode.innerHTML = d ? getFormatter(row, m)(row, cell, getDataItemValueForColumn(d, m), m, d) : "";
+                cellNode.innerHTML = d ? getFormatter(row, m)(row, cell, getFieldValue(d, m), m, d) : "";
                 invalidatePostProcessingResults(row);
             }
         }
@@ -1202,7 +1217,7 @@ if (typeof Slick === "undefined") {
                     currentEditor.loadValue(getDataItem(activeRow));
                 }
                 else if (d) {
-                    this.innerHTML = getFormatter(row, m)(row, i, getDataItemValueForColumn(d, m), m, getDataItem(row));
+                    this.innerHTML = getFormatter(row, m)(row, i, getFieldValue(d, m), m, getDataItem(row));
                 }
                 else {
                     this.innerHTML = "";
@@ -1878,7 +1893,7 @@ if (typeof Slick === "undefined") {
 
                 if (d) {
                     var column = columns[activeCell];
-                    activeCellNode.innerHTML = getFormatter(activeRow, column)(activeRow, activeCell, getDataItemValueForColumn(d, column), column, getDataItem(activeRow));
+                    activeCellNode.innerHTML = getFormatter(activeRow, column)(activeRow, activeCell, getFieldValue(d, column), column, getDataItem(activeRow));
                     invalidatePostProcessingResults(activeRow);
                 }
             }
@@ -2601,6 +2616,9 @@ if (typeof Slick === "undefined") {
             "setCellCssStyles":             setCellCssStyles,
             "removeCellCssStyles":          removeCellCssStyles,
 
+            "getFieldValue": 				getFieldValue,
+            "setFieldValue": 				setFieldValue,
+            
             "destroy":                      destroy,
 
             // IEditor implementation
