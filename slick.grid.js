@@ -891,13 +891,13 @@ if (typeof Slick === "undefined") {
             var columnIndex = getColumnIndex(sortColumnId);
 
             $headers.children().removeClass("slick-header-column-sorted");
-            $headers.find(".slick-sort-indicator").removeClass("slick-sort-indicator-asc slick-sort-indicator-desc");
+            $headers.find(".slick-sort-indicator").removeClass("ui-icon ui-icon-triangle-1-n ui-icon-triangle-1-s");
 
             if (columnIndex != null) {
                 $headers.children().eq(columnIndex)
                     .addClass("slick-header-column-sorted")
                     .find(".slick-sort-indicator")
-                        .addClass(sortAsc ? "slick-sort-indicator-asc" : "slick-sort-indicator-desc");
+                        .addClass(sortAsc ? "ui-icon ui-icon-triangle-1-s" : "ui-icon ui-icon-triangle-1-n");
             }
         }
 
